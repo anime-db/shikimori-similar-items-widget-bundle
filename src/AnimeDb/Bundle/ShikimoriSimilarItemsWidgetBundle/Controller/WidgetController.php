@@ -179,7 +179,7 @@ class WidgetController extends Controller
         if ($locale == 'ru' && $item['russian']) {
             $entity->setName($item['russian']);
         } elseif ($locale == 'ja' && $info['japanese']) {
-            $entity->setName($item['japanese'][0]);
+            $entity->setName($info['japanese'][0]);
         } else {
             $entity->setName($item['name']);
         }
@@ -206,14 +206,14 @@ class WidgetController extends Controller
 
         // find item by sources
         $sources = [$entity->getLink()];
-        if (!empty($body['world_art_id'])) {
-            $sources[] = str_replace('#ID#', $body['world_art_id'], self::WORLD_ART_URL);
+        if (!empty($info['world_art_id'])) {
+            $sources[] = str_replace('#ID#', $info['world_art_id'], self::WORLD_ART_URL);
         }
-        if (!empty($body['myanimelist_id'])) {
-            $sources[] = str_replace('#ID#', $body['myanimelist_id'], self::MY_ANIME_LIST_URL);
+        if (!empty($info['myanimelist_id'])) {
+            $sources[] = str_replace('#ID#', $info['myanimelist_id'], self::MY_ANIME_LIST_URL);
         }
-        if (!empty($body['anidb_id'])) {
-            $sources[] = str_replace('#ID#', $body['anidb_id'], self::ANI_DB_URL);
+        if (!empty($info['ani_db_id'])) {
+            $sources[] = str_replace('#ID#', $info['ani_db_id'], self::ANI_DB_URL);
         }
         /* @var $source \AnimeDb\Bundle\CatalogBundle\Entity\Source|null */
         $source = $repository->findOneByUrl($sources);
