@@ -20,8 +20,6 @@ use AnimeDb\Bundle\ShikimoriFillerBundle\Service\Filler;
 use AnimeDb\Bundle\CatalogBundle\Entity\Item;
 use AnimeDb\Bundle\CatalogBundle\Entity\Source;
 use AnimeDb\Bundle\CatalogBundle\Entity\Widget\Item as ItemWidget;
-use AnimeDb\Bundle\CatalogBundle\Entity\Widget\Genre as GenreWidget;
-use AnimeDb\Bundle\CatalogBundle\Entity\Widget\Type as TypeWidget;
 
 /**
  * Similar items widget
@@ -185,24 +183,6 @@ class WidgetController extends Controller
         }
         $entity->setLink($browser->getHost().$item['url']);
         $entity->setCover($browser->getHost().$item['image']['original']);
-
-        // set type
-        $type = new TypeWidget();
-        $type->setName($translator->trans($info['kind'], [], 'shikimori'));
-        $type->setLink($browser->getHost().'/animes/type/'.$info['kind']);
-        $entity->setType($type);
-
-        // add genres
-        foreach ($info['genres'] as $genre_info) {
-            $genre = new GenreWidget();
-            if ($locale == 'ru') {
-                $genre->setName($genre_info['russian']);
-            } else {
-                $genre->setName($genre_info['name']);
-            }
-            $genre->setLink($browser->getHost().'/animes/genre/'.$genre_info['id'].'-'.$genre_info['name']);
-            $entity->addGenre($genre);
-        }
 
         // find item by sources
         $sources = [$entity->getLink()];
