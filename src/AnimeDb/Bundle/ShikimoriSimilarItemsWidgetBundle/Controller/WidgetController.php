@@ -86,15 +86,10 @@ class WidgetController extends Controller
         if (($last_update = $this->container->getParameter('last_update')) && $request->getETags()) {
             $response->setLastModified(new \DateTime($last_update));
         }
-        // check items last update
-        /* @var $repository \AnimeDb\Bundle\CatalogBundle\Repository\Item */
-        $repository = $this->getDoctrine()->getRepository('AnimeDbCatalogBundle:Item');
-        $last_update = $repository->getLastUpdate();
-        if ($response->getLastModified() < $last_update) {
-            $response->setLastModified($last_update);
+        // item last update
+        if ($response->getLastModified() < $item->getDateUpdate()) {
+            $response->setLastModified($item->getDateUpdate());
         }
-
-        $etag = $repository->count().':';
 
         /* @var $browser \AnimeDb\Bundle\ShikimoriBrowserBundle\Service\Browser */
         $browser = $this->get('anime_db.shikimori.browser');
@@ -117,20 +112,18 @@ class WidgetController extends Controller
         $list = $browser->get(str_replace('#ID#', $item_id, self::PATH_SIMILAR_ITEMS));
         // create Etag by list items
         if ($list) {
-            $ids = [];
+            $ids = '';
             foreach ($list as $item) {
-                $ids[] = $item['id'];
+                $ids .= ':'.$item['id'];
             }
-            $etag .= implode(':', $ids);
+            $response->setEtag(md5($ids));
         }
-        $response->setEtag(md5($etag));
 
         // response was not modified for this request
         if ($response->isNotModified($request) || !$list) {
             return $response;
         }
 
-        $translator = $this->get('translator');
         $repository = $this->getDoctrine()->getRepository('AnimeDbCatalogBundle:Source');
         $locale = substr($request->getLocale(), 0, 2);
         $filler = null;
@@ -140,7 +133,7 @@ class WidgetController extends Controller
 
         // build list item entities
         foreach ($list as $key => $item) {
-            $list[$key] = $this->buildItem($item, $locale, $repository, $translator, $browser, $filler);
+            $list[$key] = $this->buildItem($item, $locale, $repository, $browser, $filler);
         }
 
         return $this->render(
@@ -156,7 +149,6 @@ class WidgetController extends Controller
      * @param array $item
      * @param string $locale
      * @param \Doctrine\ORM\EntityRepository $repository
-     * @param \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator
      * @param \AnimeDb\Bundle\ShikimoriBrowserBundle\Service\Browser $browser
      * @param \AnimeDb\Bundle\ShikimoriFillerBundle\Service\Filler $filler
      *
@@ -166,7 +158,6 @@ class WidgetController extends Controller
         array $item,
         $locale,
         EntityRepository $repository,
-        Translator $translator,
         Browser $browser,
         Filler $filler = null
     ) {
