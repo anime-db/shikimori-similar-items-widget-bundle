@@ -83,7 +83,7 @@ class WidgetController extends Controller
     {
         $response = new Response();
         // update cache if app update and Etag not Modified
-        if ($last_update = $this->container->getParameter('last_update') && $request->getETags()) {
+        if (($last_update = $this->container->getParameter('last_update')) && $request->getETags()) {
             $response->setLastModified(new \DateTime($last_update));
         }
         // check items last update
@@ -93,6 +93,7 @@ class WidgetController extends Controller
         if ($response->getLastModified() < $last_update) {
             $response->setLastModified($last_update);
         }
+
         $etag = $repository->count().':';
 
         /* @var $browser \AnimeDb\Bundle\ShikimoriBrowserBundle\Service\Browser */
