@@ -14,7 +14,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\EntityRepository;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use AnimeDb\Bundle\ShikimoriBrowserBundle\Service\Browser;
 use AnimeDb\Bundle\ShikimoriFillerBundle\Service\Filler;
 use AnimeDb\Bundle\CatalogBundle\Entity\Item;
@@ -83,7 +82,7 @@ class WidgetController extends Controller
     {
         $response = new Response();
         // update cache if app update and Etag not Modified
-        if (($last_update = $this->container->getParameter('last_update')) && $request->getETags()) {
+        if ($last_update = $this->container->getParameter('last_update')) {
             $response->setLastModified(new \DateTime($last_update));
         }
         // item last update
