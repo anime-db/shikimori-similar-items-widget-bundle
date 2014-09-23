@@ -12,7 +12,6 @@ namespace AnimeDb\Bundle\ShikimoriSimilarItemsWidgetBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\EntityRepository;
 use AnimeDb\Bundle\ShikimoriBrowserBundle\Service\Browser;
 use AnimeDb\Bundle\ShikimoriFillerBundle\Service\Filler;
@@ -87,20 +86,8 @@ class WidgetController extends Controller
      */
     public function indexAction(Item $item, Request $request)
     {
-        $response = new Response();
-        $response->setMaxAge(self::CACHE_LIFETIME);
-        $response->setSharedMaxAge(self::CACHE_LIFETIME);
-        $response->setExpires((new \DateTime())->modify('+'.self::CACHE_LIFETIME.' seconds'));
-
-        // update cache if app update and Etag not Modified
-        if ($last_update = $this->container->getParameter('last_update')) {
-            $response->setLastModified(new \DateTime($last_update));
-        }
-        // item last update
-        if ($response->getLastModified() < $item->getDateUpdate()) {
-            $response->setLastModified($item->getDateUpdate());
-        }
-
+        /* @var $response \Symfony\Component\HttpFoundation\Response */
+        $response = $this->get('cache_time_keeper')->getResponse($item->getDateUpdate(), self::CACHE_LIFETIME);
         /* @var $browser \AnimeDb\Bundle\ShikimoriBrowserBundle\Service\Browser */
         $browser = $this->get('anime_db.shikimori.browser');
 
