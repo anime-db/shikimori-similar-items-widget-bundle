@@ -68,7 +68,7 @@ class WidgetController extends Controller
 
         // build list item entities
         foreach ($list as $key => $item) {
-            $list[$key] = $widget->getItem($item['id']);
+            $list[$key] = $widget->getWidgetItem($widget->getItem($item['id']));
         }
 
         return $this->render(
