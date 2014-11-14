@@ -48,13 +48,13 @@ class WidgetController extends Controller
     {
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $this->get('cache_time_keeper')->getResponse($item->getDateUpdate(), self::CACHE_LIFETIME);
+        /* @var $widget \AnimeDb\Bundle\ShikimoriWidgetBundle\Service\Widget */
+        $widget = $this->get('anime_db.shikimori.widget');
 
         // get shikimori item id
         if (!($item_id = $widget->getItemId($item))) {
             return $response;
         }
-        /* @var $widget \AnimeDb\Bundle\ShikimoriWidgetBundle\Service\Widget */
-        $widget = $this->get('anime_db.shikimori.widget');
 
         $list = $this->get('anime_db.shikimori.browser')
             ->get(str_replace('#ID#', $item_id, self::PATH_SIMILAR_ITEMS));
